@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .temperature-card .card-icon {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        .humidity-card .card-icon {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .light-card .card-icon {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .card-unit {
+            font-size: 1rem;
+            color: #95a5a6;
+            font-weight: normal;
+        }
+
+        .lights-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .lights-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .lights-header h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-left: 15px;
+        }
+
+        .lights-header .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .light-controls {
+            display: grid;
+            gap: 20px;
+        }
+
+        .light-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .light-item:hover {
+            background: rgba(248, 249, 250, 1);
+            transform: translateX(5px);
+        }
+
+        .light-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .light-info .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .light-details h3 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .light-details p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Smart Home Dashboard</h1>
+            <p>Điều khiển thông minh ngôi nhà của bạn</p>
+        </div>
+
+        <div class="cards-container">
+            <div class="card temperature-card">
+                <div class="card-icon">🌡️</div>
+                <div class="card-title">Nhiệt độ</div>
+                <div class="card-value">24<span class="card-unit">°C</span></div>
+            </div>
+
+            <div class="card humidity-card">
+                <div class="card-icon">💧</div>
+                <div class="card-title">Độ ẩm</div>
+                <div class="card-value">65<span class="card-unit">%</span></div>
+            </div>
+
+            <div class="card light-card">
+                <div class="card-icon">💡</div>
+                <div class="card-title">Ánh sáng</div>
+                <div class="card-value">850<span class="card-unit">nits</span></div>
+            </div>
+        </div>
+
+        <div class="lights-section">
+            <div class="lights-header">
+                <div class="icon">💡</div>
+                <h2>Điều khiển đèn</h2>
+            </div>
+
+            <div class="light-controls">
+                <div class="light-item">
+                    <div class="light-info">
+                        <div class="icon">💡</div>
+                        <div class="light-details">
+                            <h3>Đèn 1</h3>
+                            <p>Phòng khách</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+
+                <div class="light-item">
+                    <div class="light-info">
+                        <div class="icon">💡</div>
+                        <div class="light-details">
+                            <h3>Đèn 2</h3>
+                            <p>Phòng ngủ</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+
+                <div class="light-item">
+                    <div class="light-info">
+                        <div class="icon">💡</div>
+                        <div class="light-details">
+                            <h3>Đèn 3</h3>
+                            <p>Bếp</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Simulate real-time data updates
+        function updateSensorData() {
+            const temperatureValue = document.querySelector('.temperature-card .card-value');
+            const humidityValue = document.querySelector('.humidity-card .card-value');
+            const lightValue = document.querySelector('.light-card .card-value');
+
+            // Generate random values for demonstration
+            const temp = Math.floor(Math.random() * 10) + 20; // 20-30°C
+            const humidity = Math.floor(Math.random() * 20) + 60; // 60-80%
+            const light = Math.floor(Math.random() * 200) + 800; // 800-1000 nits
+
+            temperatureValue.innerHTML = `${temp}<span class="card-unit">°C</span>`;
+            humidityValue.innerHTML = `${humidity}<span class="card-unit">%</span>`;
+            lightValue.innerHTML = `${light}<span class="card-unit">nits</span>`;
+        }
+
+        // Update data every 5 seconds
+        setInterval(updateSensorData, 5000);
+
+        // Add some interactive animations
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
