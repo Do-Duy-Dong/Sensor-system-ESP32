@@ -6,7 +6,7 @@ const app= express();
 const cors= require('cors');
 const httpServer= createServer(app);
 const route= require('./route');
-const dataSensor= require("./model/dataSensor");
+const {dataModel}= require("./model/dataSensor");
 const History= require("./model/History");
 const { default: mongoose } = require('mongoose');
 
@@ -16,7 +16,7 @@ const io= new Server(httpServer, {
     }
 });
 app.use(cors());
-const mqttUrl= "mqtt:// 192.168.244.129:1883";
+const mqttUrl= "mqtt://10.191.68.129:1883";
 const user='tripled'
 const password= '842004'
 const mqttClient= mqtt.connect(mqttUrl,{
@@ -27,7 +27,7 @@ const mqttClient= mqtt.connect(mqttUrl,{
 // Connect to Database
 mongoose.connect("mongodb://localhost:27017/iot")
 .then(()=>{
-    console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB');
 })
 .catch(err=>{
     console.log('Failed to connect to MongoDB', err);
@@ -46,11 +46,6 @@ io.on('connection',(socket)=>{
             }
         });
     })
-    // socket.emit('dataSensor',{
-    //     temperature: 25.5,
-    //     humidity: 52,
-    //     light: 3
-    // })
 });
 
 mqttClient.on('connect',()=>{
@@ -96,7 +91,7 @@ mqttClient.on('message',async (topic,message)=>{
         // Lưu DB
         const tmpData= JSON.parse(message.toString());
         try {
-            const record= new dataSensor({
+            const record= new dataModel({
                 temperature: tmpData.temperature,
                 light: tmpData.light,
                 humidity: tmpData.humidity  
@@ -126,7 +121,8 @@ mqttClient.on('message',async (topic,message)=>{
             await record.save();
             io.emit('ledStatus',{
                 name: keyLed,
-                msg: 1
+                msg: 1,
+                action:valueLed
             })
         } catch (error) {
             console.log(error);

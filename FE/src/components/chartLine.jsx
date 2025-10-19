@@ -7,7 +7,8 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
@@ -18,41 +19,38 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
-const RealtimeChart = ({temp, humiditi,lights,timestamp}) => {
+const RealtimeChart = ({ temp, humiditi, lights, timestamp }) => {
   const [labels, setLabels] = useState([]);
-  const [temps, setTemps] = useState([]);   // nhiệt độ
-  const [humidity, setHumidity] = useState([]); // độ ẩm
-  const [light, setLight] = useState([]); // ánh sáng
-  useEffect(() => {
-    
-  setTemps(pre=>{
-    let tmp= [...pre,temp];
-    if(tmp.length >5) tmp.shift();
-    return tmp;
-  }
-  )
-  setHumidity(pre=>{
-    let hum= [...pre,humiditi];
-    if(hum.length >5) hum.shift();
-    return hum;
-  }
-  )
-  setLight(pre=>{
-    let li= [...pre,lights];
-    if(li.length >5) li.shift();
-    return li;
-  }
-  )
-  setLabels(pre=>{
-    let lab= [...pre,new Date().toLocaleTimeString()];
-    if (lab.length>5) lab.shift();
-    return lab;
-  })
+  const [temps, setTemps] = useState([]);
+  const [humidity, setHumidity] = useState([]);
+  const [light, setLight] = useState([]);
 
-  }, [temp, humiditi.lights, timestamp]);
+  useEffect(() => {
+    setTemps(prev => {
+      const arr = [...prev, temp];
+      if (arr.length > 5) arr.shift();
+      return arr;
+    });
+    setHumidity(prev => {
+      const arr = [...prev, humiditi];
+      if (arr.length > 5) arr.shift();
+      return arr;
+    });
+    setLight(prev => {
+      const arr = [...prev, lights];
+      if (arr.length > 5) arr.shift();
+      return arr;
+    });
+    setLabels(prev => {
+      const arr = [...prev, new Date().toLocaleTimeString()];
+      if (arr.length > 5) arr.shift();
+      return arr;
+    });
+  }, [temp, humiditi, lights, timestamp]);
 
   const data = {
     labels,
@@ -60,51 +58,98 @@ const RealtimeChart = ({temp, humiditi,lights,timestamp}) => {
       {
         label: "Nhiệt độ (°C)",
         data: temps,
-        
-        borderColor: "red",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "#ff4d4d",
+        backgroundColor: "rgba(255, 77, 77, 0.2)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointBackgroundColor: "#ff4d4d",
       },
       {
         label: "Độ ẩm (%)",
         data: humidity,
-        
-        borderColor: "blue",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderColor: "#4da6ff",
+        backgroundColor: "rgba(77, 166, 255, 0.2)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointBackgroundColor: "#4da6ff",
       },
       {
         label: "Ánh sáng (lux)",
-        data: light, // Giả sử dữ liệu ánh sáng
-        borderColor: "yellow",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        // yAxisID: 'y1',
-      }
+        data: light,
+        borderColor: "#ffd633",
+        backgroundColor: "rgba(255, 214, 51, 0.2)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointBackgroundColor: "#ffd633",
+      },
     ],
   };
 
   const options = {
     responsive: true,
-    animation: false,
     maintainAspectRatio: false,
+    animation: {
+      duration: 500,
+      easing: "easeInOutQuad",
+    },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          usePointStyle: true,
+          color: "#444",
+          font: {
+            size: 13,
+            weight: "500",
+          },
+        },
+      },
+      title: {
+        display: false,
+      },
+      tooltip: {
+        backgroundColor: "#222",
+        titleColor: "#fff",
+        bodyColor: "#ddd",
+        borderColor: "#555",
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8,
+      },
+    },
     scales: {
-      x: { title: { display: true, text: "Thời gian" } },
-      y: { title: { display: true, text: "Nhiệt độ & Độ ẩm" } },
-      // y1: {
-      //   type: 'linear',
-      //   display: true,
-      //   position: 'right',
-      //   title: {
-      //     display: true,
-      //     text: 'Ánh sáng',
-      //   },
-      //   // grid line settings
-        // grid: {
-        //   drawOnChartArea: false, // only want the grid lines for one axis to show up
-        // },
-      // },
+      x: {
+        grid: {
+          color: "rgba(200,200,200,0.1)",
+        },
+        ticks: {
+          color: "#666",
+          font: { size: 10 },
+        },
+      },
+      y: {
+        min: 0,
+        max: 125,
+        ticks: {
+          stepSize: 25, 
+          color: "#666",
+          font: { size: 11 },
+        },
+        grid: {
+          color: "rgba(200,200,200,0.1)",
+        },
+      },
     },
   };
 
-  return <Line data={data} options={options} />;
+  return (
+    <div style={{ height: "320px", width: "100%", padding: "10px" }}>
+      <Line data={data} options={options} />
+    </div>
+  );
 };
 
-export default RealtimeChart;
+export default memo(RealtimeChart);

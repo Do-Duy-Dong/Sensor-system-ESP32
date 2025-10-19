@@ -143,9 +143,9 @@ const DataSensor = () => {
               </tr>
             </thead>
             <tbody>
-              {sensorData.map((item) => (
+              {sensorData.map((item,index) => (
                 <tr key={item.id}>
-                  <td>{item.id}</td>
+                  <td>{index+1}</td>
                   <td>{item.temperature}</td>
                   <td>{item.humidity}</td>
                   <td>{item.light}</td>
