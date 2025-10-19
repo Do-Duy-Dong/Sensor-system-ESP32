@@ -11,7 +11,7 @@ module.exports = (keyword)=>{
     }else if(arr.length==2){
         start= time.hour(arr[0]).minute(arr[1]).second(0).millisecond(0);
         end= time.hour(arr[0]).minute(arr[1]).second(59).millisecond(999);
-    }else if(arr.length==1){
+    }else if(arr==1){
         start= time.hour(arr[0]).minute(0).second(0).millisecond(0);
         end= time.hour(arr[0]).minute(59).second(59).millisecond(999);
     }

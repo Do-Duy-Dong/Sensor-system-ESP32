@@ -6,8 +6,7 @@ import ChartTmp from "../components/chartLine"
 import NavBar from '../components/navbar';
 import Loading from '../components/loading';
 import '../assets/SmartHomeDashboard.scss';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 import { Link } from 'react-router-dom';
 
 const socket= io("http://localhost:3000");
@@ -26,8 +25,13 @@ const SmartHomeDashboard = () => {
   const [light, setLight] = useState('');
   const [loading, setLoading] = useState(false);
   const [timestamp,setTimestamp]= useState('');
-  const [alert,setAlert]= useState(false);
-  const timeoutRef = useRef(null);
+  const tempChartRef = useRef(null);
+  const lightChartRef = useRef(null);
+  const energyChartRef = useRef(null);
+  const tempChartInstance = useRef(null);
+  const lightChartInstance = useRef(null);
+  const energyChartInstance = useRef(null);
+
 
   const toggleDevice = (deviceName) => {
     setDevices(prev => ({
@@ -60,16 +64,16 @@ const SmartHomeDashboard = () => {
         </div>
         <label className="switch">
           <input type="checkbox" checked={isActive} onChange={() => {
-            setLoading(true);
+            // setLoading(true);
             socket.emit("ledReq",{
               name: name,
               status: !isActive
             })
 
-            timeoutRef.current= setTimeout(()=>{
-              setLoading(false);
-              toast.error("Lỗi kết nối với thiết bị!")
-            },5000); 
+            // const setTime= setTimeout(()=>{
+            //   setLoading(false);
+            // },5000); 
+            // onToggle(name)
             }} />
           <span className="slider round"></span>
         </label>
@@ -101,10 +105,10 @@ const SmartHomeDashboard = () => {
     }
   
     if (type === "light") {
-      if (value < 20) return "level-5";      // 0 – 809
-      if (value < 40) return "level-4";     // 810 – 1619
-      if (value < 60) return "level-3";     // 1620 – 2429
-      if (value < 80) return "level-2";     // 2430 – 3239
+      if (value < 810) return "level-5";      // 0 – 809
+      if (value < 1620) return "level-4";     // 810 – 1619
+      if (value < 2430) return "level-3";     // 1620 – 2429
+      if (value < 3240) return "level-2";     // 2430 – 3239
       return "level-1";                       // 3240 – 4050+
     }
     
@@ -123,11 +127,9 @@ const SmartHomeDashboard = () => {
   },[]);
   useEffect(() => {
     socket.on("ledStatus",(data)=>{
-      if( data.msg == 1){
-        console.log(data.name)
-        clearTimeout(timeoutRef.current)
-        toast.success(`${data.action==1 ? "Bật" : "Tắt"} đèn thành công`)
-        setLoading(false);
+      if( data.msg== 1){
+        // clearTimeout(setTime)
+        // setLoading(false);
         toggleDevice(data.name)
       }else{
         setDevices(prev => {
@@ -139,7 +141,6 @@ const SmartHomeDashboard = () => {
           }
           return arr;
         });
-        toast.alert("Hệ thống đã tắt")
       }
     })
   },[]);
@@ -149,18 +150,7 @@ const SmartHomeDashboard = () => {
   return (
     <div className="smart-home-dashboard">
 
-      {loading && <Loading isLoading={loading}/>}
-      <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
+      {/* {loading && <Loading isLoading={loading}/>} */}
       <NavBar />
       <div className="main-content">
       <div>

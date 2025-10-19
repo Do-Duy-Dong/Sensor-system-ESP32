@@ -7,13 +7,4 @@ const dataSchema= new mongoose.Schema({
     timestamps:true
 });
 const dataModel= mongoose.model("dataSensor", dataSchema,"dataSensor");
-const streamFunc= async ()=>{
-    const changeStream= dataModel.watch([], { fullDocument: 'updateLookup' });
-    changeStream.on('change',(change)=>{
-        console.log(change.operationType);
-    })
-    changeStream.on('error',(err)=>{
-        console.log(err)
-    })
-}
-module.exports= {dataModel,streamFunc};
+module.exports= dataModel;
